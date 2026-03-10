@@ -167,6 +167,9 @@ __metadata:
     "@disclaw/eslint-config": "workspace:*"
     "@disclaw/types": "workspace:*"
     "@disclaw/typescript-config": "workspace:*"
+    "@types/js-yaml": "npm:^4.0.9"
+    "@types/node": "npm:^25.4.0"
+    js-yaml: "npm:^4.1.1"
     typescript: "npm:^5.9.2"
   languageName: unknown
   linkType: soft
@@ -179,6 +182,7 @@ __metadata:
     "@disclaw/eslint-config": "workspace:*"
     "@disclaw/types": "workspace:*"
     "@disclaw/typescript-config": "workspace:*"
+    "@types/node": "npm:^25.4.0"
     typescript: "npm:^5.9.2"
   languageName: unknown
   linkType: soft
