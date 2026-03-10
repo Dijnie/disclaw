@@ -164,4 +164,9 @@ export class Gateway {
   getCronScheduler(): CronScheduler {
     return this.cron;
   }
+
+  /** Get the Discord provider for sending messages */
+  getProvider(): Provider | null {
+    return this.provider;
+  }
 }

@@ -85,8 +85,21 @@ export async function bootstrap(options: BootstrapOptions = {}): Promise<void> {
       toolHandlers: new Map(), // Tool handlers wired to sandbox in future
       activeSkills: skills.map((s) => s.name),
       onReply: async (content) => {
-        // Send reply via gateway's provider (accessed through config)
-        console.log(`[agent] Reply: ${content.slice(0, 100)}...`);
+        console.log(`[agent] Reply (${content.length} chars): ${content.length > 200 ? content.slice(0, 200) + "..." : content}`);
+        const provider = gateway.getProvider();
+        if (!provider) {
+          console.warn("[agent] No provider available, cannot send reply");
+          return;
+        }
+        try {
+          if (inbound.messageId && inbound.channelId) {
+            await provider.replyToMessage(inbound.channelId, inbound.messageId, content);
+          } else if (inbound.channelId) {
+            await provider.sendMessage(inbound.channelId, content);
+          }
+        } catch (err) {
+          console.error("[agent] Failed to send reply to Discord:", err);
+        }
       },
       onApprovalRequired: async () => {
         // Approval workflow (to be wired to Discord reactions)
