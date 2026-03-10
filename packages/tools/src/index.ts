@@ -27,3 +27,6 @@ export {
 export {
   createGitToolHandler,
 } from "./handlers/git-tool-handler.js";
+export {
+  createCronToolHandler,
+} from "./handlers/cron-tool-handler.js";

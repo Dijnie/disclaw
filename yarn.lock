@@ -190,6 +190,7 @@ __metadata:
   dependencies:
     "@disclaw/config": "workspace:*"
     "@disclaw/eslint-config": "workspace:*"
+    "@disclaw/gateway": "workspace:*"
     "@disclaw/memory": "workspace:*"
     "@disclaw/sandbox": "workspace:*"
     "@disclaw/types": "workspace:*"

@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@disclaw/config": "workspace:*",
+    "@disclaw/gateway": "workspace:*",
     "@disclaw/memory": "workspace:*",
     "@disclaw/sandbox": "workspace:*",
     "@disclaw/types": "workspace:*"
