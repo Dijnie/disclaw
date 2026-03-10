@@ -459,9 +459,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@repo/eslint-config@npm:*, @repo/eslint-config@workspace:packages/eslint-config":
+"@htlabs/eslint-config@npm:*, @htlabs/eslint-config@workspace:packages/eslint-config":
   version: 0.0.0-use.local
-  resolution: "@repo/eslint-config@workspace:packages/eslint-config"
+  resolution: "@htlabs/eslint-config@workspace:packages/eslint-config"
   dependencies:
     "@eslint/js": "npm:^9.39.1"
     "@next/eslint-plugin-next": "npm:^15.5.0"
@@ -477,18 +477,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@repo/typescript-config@npm:*, @repo/typescript-config@workspace:packages/typescript-config":
+"@htlabs/typescript-config@npm:*, @htlabs/typescript-config@workspace:packages/typescript-config":
   version: 0.0.0-use.local
-  resolution: "@repo/typescript-config@workspace:packages/typescript-config"
+  resolution: "@htlabs/typescript-config@workspace:packages/typescript-config"
   languageName: unknown
   linkType: soft
 
-"@repo/ui@npm:*, @repo/ui@workspace:packages/ui":
+"@htlabs/ui@npm:*, @htlabs/ui@workspace:packages/ui":
   version: 0.0.0-use.local
-  resolution: "@repo/ui@workspace:packages/ui"
+  resolution: "@htlabs/ui@workspace:packages/ui"
   dependencies:
-    "@repo/eslint-config": "npm:*"
-    "@repo/typescript-config": "npm:*"
+    "@htlabs/eslint-config": "npm:*"
+    "@htlabs/typescript-config": "npm:*"
     "@types/node": "npm:^22.15.3"
     "@types/react": "npm:19.2.2"
     "@types/react-dom": "npm:19.2.2"
@@ -1095,9 +1095,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "docs@workspace:apps/docs"
   dependencies:
-    "@repo/eslint-config": "npm:*"
-    "@repo/typescript-config": "npm:*"
-    "@repo/ui": "npm:*"
+    "@htlabs/eslint-config": "npm:*"
+    "@htlabs/typescript-config": "npm:*"
+    "@htlabs/ui": "npm:*"
     "@types/node": "npm:^22.15.3"
     "@types/react": "npm:19.2.2"
     "@types/react-dom": "npm:19.2.2"
@@ -3261,9 +3261,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "web@workspace:apps/web"
   dependencies:
-    "@repo/eslint-config": "npm:*"
-    "@repo/typescript-config": "npm:*"
-    "@repo/ui": "npm:*"
+    "@htlabs/eslint-config": "npm:*"
+    "@htlabs/typescript-config": "npm:*"
+    "@htlabs/ui": "npm:*"
     "@types/node": "npm:^22.15.3"
     "@types/react": "npm:19.2.2"
     "@types/react-dom": "npm:19.2.2"
