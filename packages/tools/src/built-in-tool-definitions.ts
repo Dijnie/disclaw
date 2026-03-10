@@ -88,6 +88,30 @@ export const memoryGetTool: ToolDefinition = {
   requiresApproval: false,
 };
 
+export const memoryWriteTool: ToolDefinition = {
+  name: "memory_write",
+  description:
+    "Write to agent memory: append to daily log, update a MEMORY.md section, or write a file",
+  inputSchema: {
+    type: "object",
+    properties: {
+      action: {
+        type: "string",
+        enum: ["append_daily", "update_section", "write_file"],
+        description: "Write operation to perform",
+      },
+      content: { type: "string", description: "Content to write" },
+      target: {
+        type: "string",
+        description:
+          "Section name (for update_section) or filename (for write_file)",
+      },
+    },
+    required: ["action", "content"],
+  },
+  requiresApproval: false,
+};
+
 export const canvasTool: ToolDefinition = {
   name: "canvas",
   description: "Generate or manipulate images",
@@ -103,6 +127,64 @@ export const canvasTool: ToolDefinition = {
       path: { type: "string", description: "Output file path" },
     },
     required: ["action", "prompt"],
+  },
+  requiresApproval: false,
+};
+
+export const webSearchTool: ToolDefinition = {
+  name: "web_search",
+  description:
+    "Search the web for current information. Returns titles, URLs, and snippets from search results.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      query: { type: "string", description: "Search query string" },
+      count: {
+        type: "number",
+        description: "Number of results to return (1-10, default: 5)",
+      },
+      country: {
+        type: "string",
+        description: "2-letter country code for region-specific results (e.g., 'US', 'DE', 'VN')",
+      },
+      search_lang: {
+        type: "string",
+        description: "ISO language code for search results (e.g., 'en', 'de', 'vi')",
+      },
+      ui_lang: {
+        type: "string",
+        description: "ISO language code for UI elements",
+      },
+      freshness: {
+        type: "string",
+        description:
+          "Filter by time: 'pd' (past day), 'pw' (past week), 'pm' (past month), 'py' (past year), or 'YYYY-MM-DDtoYYYY-MM-DD'",
+      },
+    },
+    required: ["query"],
+  },
+  requiresApproval: false,
+};
+
+export const webFetchTool: ToolDefinition = {
+  name: "web_fetch",
+  description:
+    "Fetch and extract readable content from a URL (HTML → markdown/text). Use for lightweight page access without browser automation.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "HTTP or HTTPS URL to fetch" },
+      extractMode: {
+        type: "string",
+        enum: ["markdown", "text"],
+        description: 'Extraction mode (default: "markdown")',
+      },
+      maxChars: {
+        type: "number",
+        description: "Maximum characters to return (default: 50000)",
+      },
+    },
+    required: ["url"],
   },
   requiresApproval: false,
 };
@@ -148,9 +230,12 @@ export const gitTool: ToolDefinition = {
 export const builtInTools: ToolDefinition[] = [
   bashTool,
   browserTool,
+  webSearchTool,
+  webFetchTool,
   fileTool,
   memorySearchTool,
   memoryGetTool,
+  memoryWriteTool,
   canvasTool,
   cronTool,
   gitTool,

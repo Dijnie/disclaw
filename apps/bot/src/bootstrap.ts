@@ -11,7 +11,18 @@ import { join } from "node:path";
 import { loadConfig, resolveConfigPath } from "@disclaw/config";
 import { MemorySystem } from "@disclaw/memory";
 import { loadSkills } from "@disclaw/skills";
-import { ToolRegistry, builtInTools } from "@disclaw/tools";
+import {
+  ToolRegistry,
+  builtInTools,
+  createMemoryToolHandlers,
+  createFileToolHandler,
+  createBashToolHandler,
+  createGitToolHandler,
+  createCronToolHandler,
+  createBrowserToolHandler,
+  createWebSearchToolHandler,
+  createWebFetchToolHandler,
+} from "@disclaw/tools";
 import { SandboxManager } from "@disclaw/sandbox";
 import { Gateway } from "@disclaw/gateway";
 import { runAgentLoop } from "@disclaw/agent";
@@ -63,8 +74,34 @@ export async function bootstrap(options: BootstrapOptions = {}): Promise<void> {
   // 5. Create sandbox
   const sandbox = new SandboxManager(agentId, config.sandbox);
 
+  // 5b. Create tool handlers
+  const workspaceDir = join(home, ".disclaw", "workspace");
+  const toolHandlers = new Map<string, (toolCall: import("@disclaw/types").ToolCall) => Promise<string>>();
+
+  // Memory tools (memory_search, memory_get, memory_write)
+  for (const [name, handler] of createMemoryToolHandlers(memory, agentId)) {
+    toolHandlers.set(name, handler);
+  }
+  // File tool
+  toolHandlers.set("file", createFileToolHandler({ workspaceDir }));
+  // Bash tool (routes to Docker sandbox)
+  toolHandlers.set("bash", createBashToolHandler({ sandbox }));
+  // Git tool
+  toolHandlers.set("git", createGitToolHandler({ workspaceDir }));
+  // Browser tool (fetch URL content)
+  toolHandlers.set("browser", createBrowserToolHandler({ workspaceDir }));
+  // Web search tool (Brave Search + DuckDuckGo fallback)
+  toolHandlers.set("web_search", createWebSearchToolHandler());
+  // Web fetch tool (Readability extraction + SSRF protection)
+  toolHandlers.set("web_fetch", createWebFetchToolHandler());
+
+  console.log(`[disclaw] Registered ${toolHandlers.size} tool handlers`);
+
   // 6. Create gateway (includes provider + event routing)
   const gateway = new Gateway({ configPath, agentId });
+
+  // Cron tool (needs gateway's scheduler, so wired after gateway creation)
+  toolHandlers.set("cron", createCronToolHandler({ cron: gateway.getCronScheduler() }));
 
   // Wire agent runtime to gateway dispatch
   gateway.onDispatch(async (sessionKey, inbound) => {
@@ -82,7 +119,7 @@ export async function bootstrap(options: BootstrapOptions = {}): Promise<void> {
       memoryFiles,
       history: session.conversationHistory,
       tools,
-      toolHandlers: new Map(), // Tool handlers wired to sandbox in future
+      toolHandlers,
       activeSkills: skills.map((s) => s.name),
       onReply: async (content) => {
         console.log(`[agent] Reply (${content.length} chars): ${content.length > 200 ? content.slice(0, 200) + "..." : content}`);

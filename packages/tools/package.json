@@ -18,7 +18,13 @@
   },
   "dependencies": {
     "@disclaw/config": "workspace:*",
-    "@disclaw/types": "workspace:*"
+    "@disclaw/gateway": "workspace:*",
+    "@disclaw/memory": "workspace:*",
+    "@disclaw/sandbox": "workspace:*",
+    "@disclaw/types": "workspace:*",
+    "@mozilla/readability": "^0.6.0",
+    "linkedom": "^0.18.12",
+    "puppeteer": "^24.39.0"
   },
   "devDependencies": {
     "@disclaw/eslint-config": "workspace:*",

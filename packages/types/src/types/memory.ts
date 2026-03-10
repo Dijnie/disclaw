@@ -25,6 +25,14 @@ export interface MemoryGetResult {
   content: string;
 }
 
+export interface MemoryWriteRequest {
+  action: "append_daily" | "update_section" | "write_file";
+  /** Content to write */
+  content: string;
+  /** Section name (for update_section) or filename (for write_file) */
+  target?: string;
+}
+
 /** Memory layer types for context assembly */
 export type MemoryLayer = "soul" | "agents" | "memory" | "daily";
 
