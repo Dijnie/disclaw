@@ -88,6 +88,30 @@ export const memoryGetTool: ToolDefinition = {
   requiresApproval: false,
 };
 
+export const memoryWriteTool: ToolDefinition = {
+  name: "memory_write",
+  description:
+    "Write to agent memory: append to daily log, update a MEMORY.md section, or write a file",
+  inputSchema: {
+    type: "object",
+    properties: {
+      action: {
+        type: "string",
+        enum: ["append_daily", "update_section", "write_file"],
+        description: "Write operation to perform",
+      },
+      content: { type: "string", description: "Content to write" },
+      target: {
+        type: "string",
+        description:
+          "Section name (for update_section) or filename (for write_file)",
+      },
+    },
+    required: ["action", "content"],
+  },
+  requiresApproval: false,
+};
+
 export const canvasTool: ToolDefinition = {
   name: "canvas",
   description: "Generate or manipulate images",
@@ -151,6 +175,7 @@ export const builtInTools: ToolDefinition[] = [
   fileTool,
   memorySearchTool,
   memoryGetTool,
+  memoryWriteTool,
   canvasTool,
   cronTool,
   gitTool,

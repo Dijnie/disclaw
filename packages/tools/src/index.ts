@@ -10,7 +10,11 @@ export {
   fileTool,
   memorySearchTool,
   memoryGetTool,
+  memoryWriteTool,
   canvasTool,
   cronTool,
   gitTool,
 } from "./built-in-tool-definitions.js";
+export {
+  createMemoryToolHandlers,
+} from "./handlers/memory-tool-handlers.js";
