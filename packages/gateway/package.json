@@ -20,11 +20,14 @@
     "@disclaw/bot": "workspace:*",
     "@disclaw/config": "workspace:*",
     "@disclaw/memory": "workspace:*",
-    "@disclaw/types": "workspace:*"
+    "@disclaw/types": "workspace:*",
+    "ws": "^8.19.0"
   },
   "devDependencies": {
     "@disclaw/eslint-config": "workspace:*",
     "@disclaw/typescript-config": "workspace:*",
+    "@types/node": "^25.4.0",
+    "@types/ws": "^8.18.1",
     "typescript": "^5.9.2"
   }
 }
