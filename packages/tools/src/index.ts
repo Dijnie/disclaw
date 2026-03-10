@@ -18,3 +18,6 @@ export {
 export {
   createMemoryToolHandlers,
 } from "./handlers/memory-tool-handlers.js";
+export {
+  createFileToolHandler,
+} from "./handlers/file-tool-handler.js";
