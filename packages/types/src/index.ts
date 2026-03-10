@@ -1,4 +1,4 @@
 /**
  * @disclaw/types - Shared TypeScript type definitions for DisClaw
  */
-export {};
+export * from "./types/index.js";
