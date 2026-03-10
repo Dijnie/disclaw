@@ -18,11 +18,14 @@
   },
   "dependencies": {
     "@disclaw/config": "workspace:*",
-    "@disclaw/types": "workspace:*"
+    "@disclaw/types": "workspace:*",
+    "dockerode": "^4.0.9"
   },
   "devDependencies": {
     "@disclaw/eslint-config": "workspace:*",
     "@disclaw/typescript-config": "workspace:*",
+    "@types/dockerode": "^4.0.1",
+    "@types/node": "^25.4.0",
     "typescript": "^5.9.2"
   }
 }
