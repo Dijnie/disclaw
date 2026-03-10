@@ -1,0 +1,32 @@
+{
+  "name": "@disclaw/agent",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@disclaw/config": "workspace:*",
+    "@disclaw/gateway": "workspace:*",
+    "@disclaw/memory": "workspace:*",
+    "@disclaw/skills": "workspace:*",
+    "@disclaw/tools": "workspace:*",
+    "@disclaw/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@disclaw/eslint-config": "workspace:*",
+    "@disclaw/typescript-config": "workspace:*",
+    "typescript": "^5.9.2"
+  }
+}
