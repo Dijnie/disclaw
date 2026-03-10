@@ -19,6 +19,7 @@
   "dependencies": {
     "@disclaw/config": "workspace:*",
     "@disclaw/memory": "workspace:*",
+    "@disclaw/sandbox": "workspace:*",
     "@disclaw/types": "workspace:*"
   },
   "devDependencies": {

@@ -191,6 +191,7 @@ __metadata:
     "@disclaw/config": "workspace:*"
     "@disclaw/eslint-config": "workspace:*"
     "@disclaw/memory": "workspace:*"
+    "@disclaw/sandbox": "workspace:*"
     "@disclaw/types": "workspace:*"
     "@disclaw/typescript-config": "workspace:*"
     "@types/node": "npm:^25.4.0"

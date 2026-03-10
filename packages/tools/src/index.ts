@@ -21,3 +21,6 @@ export {
 export {
   createFileToolHandler,
 } from "./handlers/file-tool-handler.js";
+export {
+  createBashToolHandler,
+} from "./handlers/bash-tool-handler.js";
