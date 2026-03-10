@@ -19,6 +19,9 @@ import {
   createBashToolHandler,
   createGitToolHandler,
   createCronToolHandler,
+  createBrowserToolHandler,
+  createWebSearchToolHandler,
+  createWebFetchToolHandler,
 } from "@disclaw/tools";
 import { SandboxManager } from "@disclaw/sandbox";
 import { Gateway } from "@disclaw/gateway";
@@ -85,6 +88,12 @@ export async function bootstrap(options: BootstrapOptions = {}): Promise<void> {
   toolHandlers.set("bash", createBashToolHandler({ sandbox }));
   // Git tool
   toolHandlers.set("git", createGitToolHandler({ workspaceDir }));
+  // Browser tool (fetch URL content)
+  toolHandlers.set("browser", createBrowserToolHandler({ workspaceDir }));
+  // Web search tool (Brave Search + DuckDuckGo fallback)
+  toolHandlers.set("web_search", createWebSearchToolHandler());
+  // Web fetch tool (Readability extraction + SSRF protection)
+  toolHandlers.set("web_fetch", createWebFetchToolHandler());
 
   console.log(`[disclaw] Registered ${toolHandlers.size} tool handlers`);
 

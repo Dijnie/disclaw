@@ -102,26 +102,20 @@ export async function runAgentLoop(
   });
 
   let iteration = 0;
-  let toolResults: Array<{ type: "tool_result"; tool_use_id: string; content: string }> = [];
+
+  // Build initial messages from context — then accumulate across iterations
+  const apiMessages: Anthropic.MessageParam[] = context.messages.map(
+    (m) => ({
+      role: (m.role === "system" ? "user" : m.role) as "user" | "assistant",
+      content: m.content,
+    }),
+  );
 
   while (iteration < maxIterations) {
     iteration++;
+    console.log(`[agent-loop] Iteration ${iteration}/${maxIterations}, messages=${apiMessages.length}`);
 
     try {
-      // Build messages for API call
-      const apiMessages: Anthropic.MessageParam[] = context.messages.map(
-        (m) => ({
-          role: m.role === "system" ? "user" : m.role,
-          content: m.content,
-        }),
-      );
-
-      // Append tool results if any
-      if (toolResults.length > 0) {
-        apiMessages.push({ role: "user", content: toolResults });
-        toolResults = [];
-      }
-
       // Call LLM (streaming) — ANTHROPIC_MODEL env var overrides config
       const model = process.env["ANTHROPIC_MODEL"] ?? options.config.agent.model;
       const stream = client.messages.stream({
@@ -134,10 +128,15 @@ export async function runAgentLoop(
       });
 
       const response = await stream.finalMessage();
+      console.log(`[agent-loop] Response: stop_reason=${response.stop_reason}, blocks=${response.content.length}`);
+
+      // Append full assistant response to message history (including tool_use blocks)
+      apiMessages.push({ role: "assistant", content: response.content });
 
       // Process response content blocks
       let hasToolUse = false;
       let textContent = "";
+      const toolResults: Anthropic.ToolResultBlockParam[] = [];
 
       for (const block of response.content) {
         if (block.type === "text") {
@@ -152,11 +151,15 @@ export async function runAgentLoop(
             input: block.input as Record<string, unknown>,
           };
 
+          console.log(`[agent-loop] Tool call: ${block.name}`, JSON.stringify(block.input).slice(0, 200));
+
           const result: ToolResult = await executeTool(toolCall, {
             tools: options.tools,
             handlers: options.toolHandlers,
             onApprovalRequired: options.onApprovalRequired,
           });
+
+          console.log(`[agent-loop] Tool result: ${result.isError ? "ERROR" : "OK"} — ${result.output.slice(0, 200)}`);
 
           toolResults.push({
             type: "tool_result",
@@ -171,7 +174,7 @@ export async function runAgentLoop(
 
       // If no tool use, we're done
       if (!hasToolUse) {
-        // Add assistant response to history
+        // Add assistant response to conversation history for persistence
         if (textContent) {
           history.push({
             role: "assistant",
@@ -182,7 +185,8 @@ export async function runAgentLoop(
         break;
       }
 
-      // If tool use, continue the loop (results will be sent in next iteration)
+      // Append tool results as user message for next iteration
+      apiMessages.push({ role: "user", content: toolResults });
     } catch (err) {
       const classified = classifyError(err);
       console.error(`[agent-loop] ${classified.type} error:`, classified.message);

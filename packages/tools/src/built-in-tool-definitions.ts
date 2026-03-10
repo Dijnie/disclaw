@@ -131,6 +131,64 @@ export const canvasTool: ToolDefinition = {
   requiresApproval: false,
 };
 
+export const webSearchTool: ToolDefinition = {
+  name: "web_search",
+  description:
+    "Search the web for current information. Returns titles, URLs, and snippets from search results.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      query: { type: "string", description: "Search query string" },
+      count: {
+        type: "number",
+        description: "Number of results to return (1-10, default: 5)",
+      },
+      country: {
+        type: "string",
+        description: "2-letter country code for region-specific results (e.g., 'US', 'DE', 'VN')",
+      },
+      search_lang: {
+        type: "string",
+        description: "ISO language code for search results (e.g., 'en', 'de', 'vi')",
+      },
+      ui_lang: {
+        type: "string",
+        description: "ISO language code for UI elements",
+      },
+      freshness: {
+        type: "string",
+        description:
+          "Filter by time: 'pd' (past day), 'pw' (past week), 'pm' (past month), 'py' (past year), or 'YYYY-MM-DDtoYYYY-MM-DD'",
+      },
+    },
+    required: ["query"],
+  },
+  requiresApproval: false,
+};
+
+export const webFetchTool: ToolDefinition = {
+  name: "web_fetch",
+  description:
+    "Fetch and extract readable content from a URL (HTML → markdown/text). Use for lightweight page access without browser automation.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "HTTP or HTTPS URL to fetch" },
+      extractMode: {
+        type: "string",
+        enum: ["markdown", "text"],
+        description: 'Extraction mode (default: "markdown")',
+      },
+      maxChars: {
+        type: "number",
+        description: "Maximum characters to return (default: 50000)",
+      },
+    },
+    required: ["url"],
+  },
+  requiresApproval: false,
+};
+
 export const cronTool: ToolDefinition = {
   name: "cron",
   description: "Schedule or manage recurring tasks",
@@ -172,6 +230,8 @@ export const gitTool: ToolDefinition = {
 export const builtInTools: ToolDefinition[] = [
   bashTool,
   browserTool,
+  webSearchTool,
+  webFetchTool,
   fileTool,
   memorySearchTool,
   memoryGetTool,

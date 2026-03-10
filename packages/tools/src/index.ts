@@ -12,6 +12,8 @@ export {
   memoryGetTool,
   memoryWriteTool,
   canvasTool,
+  webSearchTool,
+  webFetchTool,
   cronTool,
   gitTool,
 } from "./built-in-tool-definitions.js";
@@ -21,4 +23,7 @@ export {
   createBashToolHandler,
   createGitToolHandler,
   createCronToolHandler,
+  createBrowserToolHandler,
+  createWebSearchToolHandler,
+  createWebFetchToolHandler,
 } from "./handlers/index.js";
