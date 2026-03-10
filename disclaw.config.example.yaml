@@ -24,8 +24,21 @@ provider:
 # Agent Configuration
 # ===========================
 agent:
-  provider: anthropic
+  provider: anthropic  # must match a key in 'providers' below
   model: claude-sonnet-4-20250514
+
+# ===========================
+# LLM Providers (Anthropic-protocol compatible)
+# ===========================
+providers:
+  anthropic:
+    enabled: true
+    apiKey: ${ANTHROPIC_API_KEY}
+  # Example: OpenRouter (Anthropic-compatible)
+  # openrouter:
+  #   enabled: true
+  #   apiKey: ${OPENROUTER_API_KEY}
+  #   baseUrl: https://openrouter.ai/api/v1
 
 # ===========================
 # Gateway Configuration

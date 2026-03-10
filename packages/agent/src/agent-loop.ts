@@ -74,9 +74,19 @@ export async function runAgentLoop(
   });
 
   // Create Anthropic client
-  const anthropicConfig = options.config.providers?.["anthropic"];
+  // Support any Anthropic-protocol-compatible API (DashScope, OpenRouter, etc.)
+  // Priority: config providers > ANTHROPIC_* env vars > defaults
+  const providerName = options.config.agent.provider ?? "anthropic";
+  const providerConfig = options.config.providers?.[providerName];
+  const apiKey = providerConfig?.apiKey
+    ?? process.env["ANTHROPIC_AUTH_TOKEN"]
+    ?? process.env["ANTHROPIC_API_KEY"]
+    ?? "";
+  const baseURL = providerConfig?.baseUrl
+    ?? process.env["ANTHROPIC_BASE_URL"];
   const client = new Anthropic({
-    apiKey: anthropicConfig?.apiKey ?? process.env["ANTHROPIC_API_KEY"] ?? "",
+    apiKey,
+    ...(baseURL ? { baseURL } : {}),
   });
 
   // Build tool definitions for Anthropic API
@@ -112,9 +122,10 @@ export async function runAgentLoop(
         toolResults = [];
       }
 
-      // Call LLM (streaming)
+      // Call LLM (streaming) — ANTHROPIC_MODEL env var overrides config
+      const model = process.env["ANTHROPIC_MODEL"] ?? options.config.agent.model;
       const stream = client.messages.stream({
-        model: options.config.agent.model,
+        model,
         max_tokens: options.config.agent.maxTokens ?? 4096,
         temperature: options.config.agent.temperature ?? 0.7,
         system: context.systemPrompt,
