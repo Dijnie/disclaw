@@ -17,6 +17,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@disclaw/config": "workspace:*",
     "@disclaw/gateway": "workspace:*",
     "@disclaw/memory": "workspace:*",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@disclaw/eslint-config": "workspace:*",
     "@disclaw/typescript-config": "workspace:*",
+    "@types/node": "^25.4.0",
     "typescript": "^5.9.2"
   }
 }
