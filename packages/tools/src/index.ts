@@ -17,16 +17,8 @@ export {
 } from "./built-in-tool-definitions.js";
 export {
   createMemoryToolHandlers,
-} from "./handlers/memory-tool-handlers.js";
-export {
   createFileToolHandler,
-} from "./handlers/file-tool-handler.js";
-export {
   createBashToolHandler,
-} from "./handlers/bash-tool-handler.js";
-export {
   createGitToolHandler,
-} from "./handlers/git-tool-handler.js";
-export {
   createCronToolHandler,
-} from "./handlers/cron-tool-handler.js";
+} from "./handlers/index.js";
