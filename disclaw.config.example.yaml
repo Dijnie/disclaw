@@ -1,0 +1,43 @@
+# disclaw.config.yaml — DisClaw configuration
+# Copy to ~/.disclaw/disclaw.config.yaml and set environment variables
+
+# ===========================
+# Discord Provider
+# ===========================
+provider:
+  method: bot
+  token: ${DISCORD_BOT_TOKEN}
+  intents:
+    - Guilds
+    - GuildMessages
+    - MessageContent
+    - DirectMessages
+  # allowlist:
+  #   guilds:
+  #     - "123456789"
+  #   channels:
+  #     - "111111111"
+  #   users:
+  #     - "333333333"
+
+# ===========================
+# Agent Configuration
+# ===========================
+agent:
+  provider: anthropic
+  model: claude-sonnet-4-20250514
+
+# ===========================
+# Gateway Configuration
+# ===========================
+gateway:
+  port: 18789
+  heartbeat:
+    interval: 30m
+
+# ===========================
+# Sandbox Configuration
+# ===========================
+sandbox:
+  enabled: true
+  runtime: docker

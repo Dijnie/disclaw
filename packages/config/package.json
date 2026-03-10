@@ -17,11 +17,15 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@disclaw/types": "workspace:*"
+    "@disclaw/types": "workspace:*",
+    "js-yaml": "^4.1.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@disclaw/eslint-config": "workspace:*",
     "@disclaw/typescript-config": "workspace:*",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^25.4.0",
     "typescript": "^5.9.2"
   }
 }
