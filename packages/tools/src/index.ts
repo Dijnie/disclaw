@@ -24,3 +24,6 @@ export {
 export {
   createBashToolHandler,
 } from "./handlers/bash-tool-handler.js";
+export {
+  createGitToolHandler,
+} from "./handlers/git-tool-handler.js";
