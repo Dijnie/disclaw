@@ -26,3 +26,10 @@ export { isAllowed } from "./allowlist-filter.js";
 export { buildSessionKey } from "./session-key-builder.js";
 export type { SessionKeyContext } from "./session-key-builder.js";
 export { splitMessage } from "./message-sender.js";
+export {
+  resolveUserRole,
+  resolvePermissions,
+  isToolAllowed,
+  filterToolsByPermissions,
+} from "./role-permission-resolver.js";
+export type { ResolvedPermissions } from "./role-permission-resolver.js";

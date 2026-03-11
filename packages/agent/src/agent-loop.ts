@@ -25,6 +25,10 @@ import {
 } from "./tool-executor.js";
 import { StreamHandler } from "./stream-handler.js";
 import { classifyError } from "./error-handler.js";
+import {
+  resolvePermissions,
+  filterToolsByPermissions,
+} from "@disclaw/bot";
 
 export interface AgentLoopOptions {
   config: DisclawConfig;
@@ -57,6 +61,16 @@ export async function runAgentLoop(
   const maxIterations = options.maxIterations ?? 10;
   const history = [...options.history];
 
+  // Resolve role-based permissions for this user
+  const permissions = resolvePermissions(
+    inbound.userId,
+    options.config.provider.roles,
+  );
+  // Filter tools to only those allowed by user's role
+  const allowedTools = filterToolsByPermissions(options.tools, permissions);
+
+  console.log(`[agent-loop] User ${inbound.userId} role="${permissions.role}", tools=${allowedTools.size}/${options.tools.size}`);
+
   // Add the user message to history
   history.push({
     role: "user",
@@ -64,12 +78,12 @@ export async function runAgentLoop(
     timestamp: inbound.timestamp,
   });
 
-  // Assemble context
+  // Assemble context (only expose allowed tools to LLM)
   const context = assembleContext({
     memoryFiles: options.memoryFiles,
     history,
     activeSkills: options.activeSkills,
-    activeTools: [...options.tools.keys()],
+    activeTools: [...allowedTools.keys()],
     maxContextChars: (options.config.agent.contextWindow ?? 200000) * 3,
   });
 
@@ -89,8 +103,8 @@ export async function runAgentLoop(
     ...(baseURL ? { baseURL } : {}),
   });
 
-  // Build tool definitions for Anthropic API
-  const toolDefs = [...options.tools.values()].map((t) => ({
+  // Build tool definitions for Anthropic API (only allowed tools)
+  const toolDefs = [...allowedTools.values()].map((t) => ({
     name: t.name,
     description: t.description,
     input_schema: t.inputSchema as Anthropic.Tool["input_schema"],
@@ -154,9 +168,10 @@ export async function runAgentLoop(
           console.log(`[agent-loop] Tool call: ${block.name}`, JSON.stringify(block.input).slice(0, 200));
 
           const result: ToolResult = await executeTool(toolCall, {
-            tools: options.tools,
+            tools: allowedTools,
             handlers: options.toolHandlers,
             onApprovalRequired: options.onApprovalRequired,
+            permissions,
           });
 
           console.log(`[agent-loop] Tool result: ${result.isError ? "ERROR" : "OK"} — ${result.output.slice(0, 200)}`);
