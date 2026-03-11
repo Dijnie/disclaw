@@ -7,12 +7,17 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "start": "yarn workspace @disclaw/bot-app start"
+    "start": "yarn workspace @disclaw/bot-app start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
+    "@vitest/coverage-istanbul": "^4.0.18",
     "prettier": "^3.7.4",
     "turbo": "^2.8.14",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=18"
