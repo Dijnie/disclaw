@@ -19,7 +19,8 @@
   "dependencies": {
     "@disclaw/config": "workspace:*",
     "@disclaw/types": "workspace:*",
-    "discord.js": "^14.25.1"
+    "discord.js": "^14.25.1",
+    "discord.js-selfbot-v13": "^3.7.1"
   },
   "devDependencies": {
     "@disclaw/eslint-config": "workspace:*",

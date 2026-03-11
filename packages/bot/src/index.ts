@@ -1,11 +1,11 @@
 /**
- * @disclaw/bot - Discord provider (discord.js bot, selfbotjs placeholder)
+ * @disclaw/bot - Discord provider (discord.js bot + selfbot-v13)
  */
 
 import type { ProviderConfig } from "@disclaw/types";
 import type { Provider } from "./provider-interface.js";
 import { DiscordJsProvider } from "./discord-js-provider.js";
-import { SelfbotProviderStub } from "./selfbot-provider-stub.js";
+import { SelfbotProvider } from "./selfbot-provider.js";
 
 /** Factory: create a Discord provider based on config method */
 export function createProvider(config: ProviderConfig): Provider {
@@ -13,14 +13,14 @@ export function createProvider(config: ProviderConfig): Provider {
     case "bot":
       return new DiscordJsProvider(config);
     case "selfbot":
-      return new SelfbotProviderStub();
+      return new SelfbotProvider(config);
     default:
       throw new Error(`Unknown provider method: ${config.method}`);
   }
 }
 
 export { DiscordJsProvider } from "./discord-js-provider.js";
-export { SelfbotProviderStub } from "./selfbot-provider-stub.js";
+export { SelfbotProvider } from "./selfbot-provider.js";
 export type { Provider, MessageHandler } from "./provider-interface.js";
 export { isAllowed } from "./allowlist-filter.js";
 export { buildSessionKey } from "./session-key-builder.js";
