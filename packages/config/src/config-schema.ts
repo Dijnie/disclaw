@@ -5,6 +5,12 @@
 
 import { z } from "zod";
 
+const roleConfigSchema = z.object({
+  users: z.array(z.string()).optional(),
+  tools: z.union([z.literal("*"), z.array(z.string())]),
+  skipApproval: z.boolean().optional(),
+});
+
 const providerSchema = z.object({
   method: z.enum(["bot", "selfbot"]),
   token: z.string().min(1, "Discord token is required"),
@@ -16,6 +22,7 @@ const providerSchema = z.object({
       users: z.array(z.string()).optional(),
     })
     .optional(),
+  roles: z.record(z.string(), roleConfigSchema).optional(),
 });
 
 const agentSchema = z.object({

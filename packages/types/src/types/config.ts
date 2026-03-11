@@ -3,6 +3,16 @@
  * See: docs/disclaw/07-configuration.md
  */
 
+/** Per-role permission config: which tools are accessible and approval behavior */
+export interface RoleConfig {
+  /** Discord user IDs assigned to this role */
+  users?: string[];
+  /** Allowed tool names, or "*" for all tools */
+  tools: string[] | "*";
+  /** If true, skip approval gates for this role (e.g., owner) */
+  skipApproval?: boolean;
+}
+
 export interface ProviderConfig {
   method: "bot" | "selfbot";
   token: string;
@@ -12,6 +22,8 @@ export interface ProviderConfig {
     channels?: string[];
     users?: string[];
   };
+  /** Role-based permissions. Key = role name, "user" is the default fallback role */
+  roles?: Record<string, RoleConfig>;
 }
 
 export interface AgentConfig {
