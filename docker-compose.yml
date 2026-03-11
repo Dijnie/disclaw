@@ -15,7 +15,7 @@ services:
       - NODE_ENV=production
     volumes:
       # Persist config and memory data
-      - disclaw-config:/home/disclaw/.disclaw
+      - disclaw-config:/home/root/.disclaw
       - disclaw-data:/app/data
 
 volumes:
