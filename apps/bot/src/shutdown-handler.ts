@@ -26,6 +26,9 @@ export function registerShutdown(context: ShutdownContext): void {
     try {
       await context.gateway.shutdown();
       context.memory.close();
+      if (context.sandbox) {
+        console.log("[disclaw] Sandbox cleanup (containers auto-removed per execution)");
+      }
       console.log("[disclaw] Shutdown complete");
       process.exit(0);
     } catch (err) {

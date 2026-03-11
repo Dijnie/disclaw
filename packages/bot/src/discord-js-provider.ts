@@ -6,6 +6,7 @@
  * filters via allowlist, emits to handlers.
  */
 
+import { randomUUID } from "node:crypto";
 import {
   Client,
   GatewayIntentBits,
@@ -137,8 +138,9 @@ export class DiscordJsProvider implements Provider {
       return false;
     }
 
-    const approveId = `approval:${Date.now()}:approve`;
-    const denyId = `approval:${Date.now()}:deny`;
+    const nonce = randomUUID();
+    const approveId = `approval:${nonce}:approve`;
+    const denyId = `approval:${nonce}:deny`;
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()

@@ -5,6 +5,7 @@ export default defineConfig({
     globals: true,
     exclude: [
       "**/node_modules/**",
+      "**/dist/**",
       ".claude/**",
       ".opencode/**",
     ],
