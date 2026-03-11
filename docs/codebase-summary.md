@@ -2,18 +2,20 @@
 
 ## Current State
 
-DisClaw is in **MVP Bootstrap Complete** phase (Phase 1). All core packages have been scaffolded with initial implementations:
+DisClaw is in **MVP Bootstrap Complete** phase (Phase 1). All core packages fully implemented with testing & CI/CD:
 
 - **@disclaw/types** - Shared TypeScript types
 - **@disclaw/config** - YAML configuration with env interpolation and hot-reload
-- **@disclaw/bot** - Discord provider (discord.js v14+)
-- **@disclaw/gateway** - Central event router, session manager, cron, heartbeat
-- **@disclaw/agent** - Agent loop with Anthropic SDK integration
+- **@disclaw/bot** - Discord provider (discord.js v14+ with approval gate support)
+- **@disclaw/gateway** - Central event router, session manager, cron, heartbeat, approval gates
+- **@disclaw/agent** - Agent loop with Anthropic SDK integration and approval hooks
 - **@disclaw/memory** - Markdown memory system with SQLite vector indexing
-- **@disclaw/tools** - Tool registry with 8 built-in tools
+- **@disclaw/tools** - Tool registry with 10 built-in tools + approval gate integration
 - **@disclaw/skills** - Skill loader and injector
 - **@disclaw/sandbox** - Docker sandbox with fail-closed security
-- **apps/bot** - Main entry point
+- **apps/bot** - Main entry point with full tool handler wiring
+- **Testing**: Vitest with 11 test suites, 61 tests, >80% coverage target
+- **CI/CD**: GitHub Actions workflow for build/lint/test/coverage
 
 ---
 
@@ -293,11 +295,12 @@ Skill loader and injector system.
 - **Dependencies**: @disclaw/types
 
 ### @disclaw/sandbox
-Docker sandbox isolation for safe tool execution.
+Docker sandbox isolation for safe tool execution with approval workflows.
 - **Status**: Implemented
 - **Key Classes**: SandboxManager, PathValidator, ResourceLimits, ApprovalGate, AuditLog
-- **Features**: Fail-closed isolation, resource limits, path validation, approval workflows
-- **Dependencies**: @disclaw/types, docker SDK
+- **Features**: Fail-closed isolation, resource limits, path validation, Discord button-based approvals
+- **Approval Gate**: Sends Discord messages with Approve/Deny buttons, timeout 60s default, logs all decisions
+- **Dependencies**: @disclaw/types, docker SDK, @disclaw/bot
 
 ### apps/bot
 Main application entry point combining all packages.
@@ -545,15 +548,24 @@ refactor: simplify event routing logic
 
 ---
 
-## 9. Testing Strategy (MVP)
+## 9. Testing & CI/CD Infrastructure
 
 ### Test Framework
-- **Jest** for unit and integration tests
+- **Vitest** for unit and integration tests (workspace-aware)
 - **TypeScript** with strict type checking
 - **ESLint** for code quality
+- **Coverage Provider**: Istanbul with text + LCOV reporters
 
 ### Test Coverage Target
-Minimum **80% code coverage** for all packages.
+**>80% code coverage** across all packages.
+
+### Test Suites (11 total, 61 tests)
+- Config: 1 suite (config-loader)
+- Gateway: 3 suites (event-router, session-manager, approval-gate)
+- Agent: 1 suite (tool-executor)
+- Memory: 1 suite (vector-indexer)
+- Tools: 3 suites (bash-handler, git-handler, file-handler, tool-registry)
+- Sandbox: 1 suite (path-validator)
 
 ### Unit Tests (Per Package)
 - **@disclaw/types**: Type validation
@@ -585,18 +597,33 @@ Minimum **80% code coverage** for all packages.
 # Run all tests
 yarn test
 
-# Run tests with coverage
-yarn test --coverage
+# Run tests with coverage report (text + LCOV)
+yarn test:coverage
 
 # Run tests in watch mode
 yarn test --watch
 
 # Type checking
-yarn typecheck
+yarn check-types
 
 # Linting
 yarn lint
+
+# Build all packages
+yarn build
 ```
+
+### CI/CD Pipeline (.github/workflows/ci.yml)
+
+Runs on: Push to main, Pull requests to main
+
+**Jobs** (sequential):
+1. Install dependencies (Node v20, cached)
+2. Build: `yarn build`
+3. Lint: `yarn lint`
+4. Type check: `yarn check-types`
+5. Test: `yarn test`
+6. Coverage: `yarn test:coverage` (PRs only)
 
 ---
 

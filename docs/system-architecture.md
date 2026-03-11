@@ -137,11 +137,17 @@ flowchart TD
 2. Overlay environment variables
 3. Validate configuration schema
 4. Start file watcher for hot-reload
-5. Initialize Discord provider (discord.js client)
-6. Create session manager + persistence layer
-7. Start heartbeat timer (30 min interval)
-8. Start cron scheduler (run loop every 1s)
-9. Listen for Discord events
+5. Initialize memory system (load SOUL.md, AGENTS.md, sync vector index)
+6. Load skills from workspace + user directories
+7. Create tool registry (built-in tools + skills)
+8. Create sandbox manager (Docker configuration)
+9. Create & wire tool handlers (memory, file, bash, git, browser, web_search, web_fetch, cron)
+10. Initialize Discord provider (discord.js client)
+11. Create session manager + persistence layer
+12. Wire agent loop to gateway dispatch (with approval gate)
+13. Start heartbeat timer (30 min interval)
+14. Start cron scheduler (run loop every 1s)
+15. Listen for Discord events
 ```
 
 ### Configuration File
@@ -215,8 +221,9 @@ Tool Call
 Check: Approval Required?
   ├─ No → Execute immediately
   └─ Yes → Create approval gate
-           Wait for user approval
-           Approved? → Execute : Reject
+           Send Discord approval message with Approve/Deny buttons
+           Wait for user interaction (timeout: 60s default)
+           Approved? → Execute : Reject (fail-closed)
   ↓
 Route by Tool Type
   ├─ bash → Docker sandbox
@@ -224,9 +231,11 @@ Route by Tool Type
   ├─ file → Local workspace (validated path)
   ├─ memory_search → SQLite index search
   ├─ memory_get → Direct file read
-  ├─ canvas → Image generation
+  ├─ memory_write → Append to MEMORY.md
   ├─ cron → Job persistence
-  └─ git → Git commands (sandbox)
+  ├─ git → Git commands (sandbox)
+  ├─ web_search → Brave Search API
+  └─ web_fetch → Content extraction with Readability
   ↓
 Sandbox (for bash, git)
   ├─ Create container from image
@@ -240,6 +249,15 @@ Tool Result
   ├─ Success: {exitCode, stdout, stderr}
   └─ Error: SandboxError, ToolError, or similar
 ```
+
+### Approval Gate Implementation
+
+Approval requests are sent as Discord messages with interactive buttons (Components API):
+
+- **Provider Interface**: `sendApprovalRequest(channelId, content, userId, timeoutMs)` → Promise<boolean>
+- **Gateway Module**: `requestApproval(toolCall, options)` formats tool preview and manages button interaction
+- **fail-closed**: If user denies or timeout expires, tool execution is rejected
+- **Tools Requiring Approval**: bash, git (push/force-push)
 
 ---
 
@@ -313,10 +331,13 @@ interface LLMProvider {
 
 ### Approval Workflows
 
-- Bash and git push/force-push require user approval
-- Approval gate sends prompt to user in Discord
-- Timeout: approval request expires after 5 minutes
-- Logging: all approval requests and decisions logged
+- **Bash and git push/force-push** require user approval before execution
+- **Approval Gate**: Sends Discord message with Approve/Deny buttons (Components API)
+- **Timeout**: 60 seconds default (configurable), request expires and is rejected
+- **User Interaction**: Button clicks handled via Discord interaction webhooks
+- **Fail-Closed**: Tool execution rejects if timeout expires or user denies
+- **Logging**: All approval requests and decisions logged for audit trail
+- **Provider Interface**: `Provider.sendApprovalRequest()` method handles button setup and result collection
 
 ### Resource Isolation
 
@@ -436,11 +457,68 @@ See `docs/` directory:
 
 ---
 
-## 16. Next Steps
+## 16. Testing Infrastructure
+
+### Test Framework & Coverage
+
+- **Framework**: Vitest with workspace configuration (`vitest.workspace.ts`)
+- **Coverage Target**: >80% code coverage via Istanbul provider
+- **Test Suites**: 11 test files across packages (61 total tests)
+- **Coverage Report**: Text + LCOV formats
+
+### Test Organization
+
+| Package | Tests | Focus |
+|---------|-------|-------|
+| @disclaw/config | 1 suite | Config loading, schema validation, hot-reload |
+| @disclaw/gateway | 3 suites | EventRouter, SessionManager, ApprovalGate |
+| @disclaw/agent | 1 suite | ToolExecutor |
+| @disclaw/memory | 1 suite | VectorIndexer |
+| @disclaw/tools | 3 suites | BashHandler, GitHandler, FileHandler, ToolRegistry |
+| @disclaw/sandbox | 1 suite | PathValidator |
+
+### Test Commands
+
+```bash
+# Run all tests
+yarn test
+
+# Run tests with coverage report
+yarn test:coverage
+
+# Run tests in watch mode
+yarn test --watch
+```
+
+---
+
+## 17. CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+File: `.github/workflows/ci.yml`
+
+**Triggers**: Push to main, pull requests to main
+
+**Jobs**:
+1. **Build**: Compile TypeScript to JavaScript via `yarn build`
+2. **Lint**: ESLint via `yarn lint`
+3. **Type Check**: TypeScript strict mode via `yarn check-types`
+4. **Test**: Vitest via `yarn test`
+5. **Coverage**: Coverage report via `yarn test:coverage` (PRs only)
+
+**Environment**:
+- Node.js v20
+- Corepack enabled for Yarn package manager
+- Cached dependencies for faster builds
+
+---
+
+## 19. Next Steps
 
 Implementation roadmap:
 
-1. **Phase 1 (MVP)**: Core components (provider, gateway, agent, memory, tools, sandbox)
+1. **Phase 1 (MVP)**: Core components (provider, gateway, agent, memory, tools, sandbox) — **IN PROGRESS**
 2. **Phase 2 (Polish)**: Skills, multi-provider LLM, optimization
 3. **Phase 3 (Advanced)**: Multi-agent teams, selfbotjs, web dashboard
 

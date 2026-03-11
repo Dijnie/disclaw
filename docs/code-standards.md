@@ -695,6 +695,101 @@ function validatePath(path: string): boolean {
 
 ---
 
+---
+
+## 15. Approval Gate Pattern
+
+### Dangerous Tools
+
+Bash and git require approval before execution. Request approval via provider interface:
+
+```typescript
+const approved = await requestApproval(toolCall, {
+  provider,
+  channelId,
+  userId,
+  timeoutMs: 60_000,
+});
+
+if (!approved) throw new Error(`Tool execution rejected`);
+```
+
+### Discord Button Implementation
+
+Provider interface includes button-based approval:
+
+```typescript
+interface Provider {
+  /**
+   * Send approval request with Approve/Deny buttons
+   * Returns true if user clicked Approve, false if timeout/deny
+   */
+  sendApprovalRequest(
+    channelId: string,
+    content: string,
+    userId: string,
+    timeoutMs: number
+  ): Promise<boolean>;
+}
+```
+
+### Message Format
+
+Approval messages preview tool input (truncated to 200 chars) with Approve/Deny buttons.
+
+---
+
+## 16. Tool Handler Factory Pattern
+
+Tool handlers are created via factory functions to encapsulate dependencies:
+
+```typescript
+// Factory function signature
+function createBashToolHandler(options: {
+  sandbox: SandboxManager;
+}): (toolCall: ToolCall) => Promise<string> {
+  return async (toolCall) => {
+    // Handler implementation
+    const result = await options.sandbox.execute(toolCall.input.command);
+    return JSON.stringify(result);
+  };
+}
+
+// Registration in bootstrap
+const toolHandlers = new Map<string, (toolCall: ToolCall) => Promise<string>>();
+toolHandlers.set("bash", createBashToolHandler({ sandbox }));
+toolHandlers.set("file", createFileToolHandler({ workspaceDir }));
+```
+
+---
+
+## 17. Testing Best Practices (Vitest)
+
+### Test File Organization
+
+One test file per source file. Use Vitest describe/it blocks:
+
+```typescript
+// packages/gateway/src/__tests__/approval-gate.test.ts
+import { describe, it, expect } from "vitest";
+import { requestApproval } from "../approval-gate";
+
+describe("requestApproval", () => {
+  it("should format tool call into approval message", async () => {
+    // Test implementation
+  });
+  it("should return false if timeout expires", async () => {
+    // Test timeout behavior
+  });
+});
+```
+
+### Coverage Target
+
+Aim for >80% line coverage. Test error paths, approval gates, and sandbox limits.
+
+---
+
 ## Cross-References
 
 - [project-overview-pdr.md](./project-overview-pdr.md) — Project requirements
