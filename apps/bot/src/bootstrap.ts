@@ -24,7 +24,7 @@ import {
   createWebFetchToolHandler,
 } from "@disclaw/tools";
 import { SandboxManager } from "@disclaw/sandbox";
-import { Gateway } from "@disclaw/gateway";
+import { Gateway, requestApproval } from "@disclaw/gateway";
 import { runAgentLoop } from "@disclaw/agent";
 
 import { registerShutdown } from "./shutdown-handler.js";
@@ -138,9 +138,15 @@ export async function bootstrap(options: BootstrapOptions = {}): Promise<void> {
           console.error("[agent] Failed to send reply to Discord:", err);
         }
       },
-      onApprovalRequired: async () => {
-        // Approval workflow (to be wired to Discord reactions)
-        return false; // Default deny for safety
+      onApprovalRequired: async (toolCall) => {
+        const provider = gateway.getProvider();
+        if (!provider) return false;
+        return requestApproval(toolCall, {
+          provider,
+          channelId: inbound.channelId,
+          userId: inbound.userId,
+          timeoutMs: 60_000,
+        });
       },
       onPersist: async (history) => {
         session.conversationHistory = history;
@@ -153,7 +159,7 @@ export async function bootstrap(options: BootstrapOptions = {}): Promise<void> {
   await gateway.start();
 
   // 8. Register graceful shutdown
-  registerShutdown({ gateway, memory });
+  registerShutdown({ gateway, memory, sandbox });
 
   console.log("[disclaw] DisClaw is running");
 }

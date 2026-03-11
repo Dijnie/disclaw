@@ -18,4 +18,6 @@ export interface Provider {
   sendMessage(channelId: string, content: string): Promise<void>;
   /** Reply to a specific message */
   replyToMessage(channelId: string, messageId: string, content: string): Promise<void>;
+  /** Send approval request with Approve/Deny buttons, returns true if approved */
+  sendApprovalRequest(channelId: string, content: string, userId: string, timeoutMs: number): Promise<boolean>;
 }

@@ -6,7 +6,16 @@
  * filters via allowlist, emits to handlers.
  */
 
-import { Client, GatewayIntentBits, type Message } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  type Message,
+  type TextChannel,
+} from "discord.js";
 
 import type { InboundContext, ProviderConfig } from "@disclaw/types";
 import type { Provider, MessageHandler } from "./provider-interface.js";
@@ -115,5 +124,90 @@ export class DiscordJsProvider implements Provider {
     content: string,
   ): Promise<void> {
     await sendReply(this.client, channelId, messageId, content);
+  }
+
+  async sendApprovalRequest(
+    channelId: string,
+    content: string,
+    userId: string,
+    timeoutMs: number,
+  ): Promise<boolean> {
+    const channel = await this.client.channels.fetch(channelId);
+    if (!channel || !("send" in channel)) {
+      return false;
+    }
+
+    const approveId = `approval:${Date.now()}:approve`;
+    const denyId = `approval:${Date.now()}:deny`;
+
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(approveId)
+        .setLabel("Approve")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId(denyId)
+        .setLabel("Deny")
+        .setStyle(ButtonStyle.Danger),
+    );
+
+    const textChannel = channel as TextChannel;
+    const message = await textChannel.send({
+      content,
+      components: [row],
+    });
+
+    try {
+      const interaction = await message.awaitMessageComponent({
+        componentType: ComponentType.Button,
+        filter: (i) => i.user.id === userId,
+        time: timeoutMs,
+      });
+
+      const approved = interaction.customId === approveId;
+      const label = approved ? "Approved" : "Denied";
+
+      // Disable buttons and show result
+      const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId(approveId)
+          .setLabel("Approve")
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId(denyId)
+          .setLabel("Deny")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(true),
+      );
+
+      await interaction.update({
+        content: `${content}\n\n**${label}**`,
+        components: [disabledRow],
+      });
+
+      return approved;
+    } catch {
+      // Timeout — auto-deny, disable buttons
+      const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId(approveId)
+          .setLabel("Approve")
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId(denyId)
+          .setLabel("Deny")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(true),
+      );
+
+      await message.edit({
+        content: `${content}\n\n**Timed out — denied**`,
+        components: [disabledRow],
+      }).catch(() => {});
+
+      return false;
+    }
   }
 }

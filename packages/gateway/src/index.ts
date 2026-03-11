@@ -14,3 +14,5 @@ export { CronScheduler } from "./cron-scheduler.js";
 export type { CronJob, ScheduleType, CronHandler } from "./cron-scheduler.js";
 export { WsServer } from "./ws-server.js";
 export type { WsServerOptions } from "./ws-server.js";
+export { requestApproval } from "./approval-gate.js";
+export type { ApprovalGateOptions } from "./approval-gate.js";

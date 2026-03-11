@@ -119,4 +119,14 @@ export class SelfbotProvider implements Provider {
       await channel.send(chunks[i]!);
     }
   }
+
+  async sendApprovalRequest(
+    _channelId: string,
+    _content: string,
+    _userId: string,
+    _timeoutMs: number,
+  ): Promise<boolean> {
+    // Selfbot cannot use Discord buttons — deny all approval requests
+    return false;
+  }
 }

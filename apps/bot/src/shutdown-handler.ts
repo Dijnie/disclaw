@@ -5,10 +5,12 @@
 
 import type { Gateway } from "@disclaw/gateway";
 import type { MemorySystem } from "@disclaw/memory";
+import type { SandboxManager } from "@disclaw/sandbox";
 
 export interface ShutdownContext {
   gateway: Gateway;
   memory: MemorySystem;
+  sandbox?: SandboxManager;
 }
 
 /** Register shutdown handlers for graceful cleanup */
