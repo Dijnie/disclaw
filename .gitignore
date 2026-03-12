@@ -47,4 +47,4 @@ plans/*
 .opencode
 AGENTS.md
 repomix-output.xml
-.yarn/install-state.gz
+.yarn
